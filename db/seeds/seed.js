@@ -76,8 +76,8 @@ function createArticles() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     votes INT DEFAULT 0,
     article_img_url VARCHAR (1000),
-    FOREIGN KEY (topic) REFERENCES topics(slug),
-    FOREIGN KEY (author) REFERENCES users(username)
+    FOREIGN KEY (topic) REFERENCES topics(slug) ON DELETE CASCADE,
+    FOREIGN KEY (author) REFERENCES users(username) ON DELETE CASCADE
     )
     `);
 }
@@ -86,13 +86,13 @@ function createComments() {
   return db.query(`CREATE TABLE comments
     (
     comment_id SERIAL PRIMARY KEY,
-    article_id INT,
+    article_id INT NOT NULL,
     body TEXT NOT NULL,
     votes INT DEFAULT 0,
     author VARCHAR NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (article_id) REFERENCES articles(article_id),
-    FOREIGN KEY (author) REFERENCES users(username)
+    FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
+    FOREIGN KEY (author) REFERENCES users(username) ON DELETE CASCADE
     )
     `);
 }
@@ -168,7 +168,6 @@ function insertComments(commentsData) {
       comment.created_at,
     ];
   });
-  console.log(commentsArr);
   return db.query(
     format(
       `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L RETURNING *`,
