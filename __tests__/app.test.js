@@ -43,7 +43,7 @@ describe("GET /api/topics", () => {
         });
       });
   });
-  test("404: Responds with 404 status and a 'No topics found' if tno topics exist", () => {
+  test("404: Responds with 404 status and an error message 'No topics found' if no topics exist", () => {
     db.query("DELETE FROM topics").then(() => {
       return request(app)
         .get("/api/topics")
@@ -52,5 +52,42 @@ describe("GET /api/topics", () => {
           expect(body.message).toBe("No topics found");
         });
     });
+  });
+});
+
+describe("GET /api/articles/1", () => {
+  test("200: Responds with an object containing the requested article id", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.article;
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test("400: Responds with an error message 'Bad request'", () => {
+    return request(app)
+      .get("/api/articles/numberone")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request");
+      });
+  });
+  test("404: Responds with an error message 'Article not found'", () => {
+    return request(app)
+      .get("/api/articles/2000")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
   });
 });

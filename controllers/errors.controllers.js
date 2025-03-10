@@ -1,3 +1,11 @@
+function handlePsqlErrors(err, req, res, next) {
+  if (err.code === "22P02") {
+    res.status(400).send({ message: "Bad request" });
+  } else {
+    next(err);
+  }
+}
+
 function handleCustomErrors(err, req, res, next) {
   if (err.status && err.message) {
     res.status(err.status).send({ message: err.message });
@@ -7,7 +15,8 @@ function handleCustomErrors(err, req, res, next) {
 }
 
 function handleServerErrors(err, req, res, next) {
+  console.log(err);
   res.status(500).send({ message: "Internal Server Error" });
 }
 
-module.exports = { handleCustomErrors, handleServerErrors };
+module.exports = { handleCustomErrors, handleServerErrors, handlePsqlErrors };
