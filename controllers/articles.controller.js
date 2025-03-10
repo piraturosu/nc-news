@@ -1,14 +1,18 @@
 const { fetchArticles } = require("../models/articles.models");
 
-function getArticleById(req, res, next) {
+function getArticles(req, res, next) {
   const { article_id } = req.params;
   fetchArticles(article_id)
-    .then((article) => {
-      res.status(200).send({ article });
+    .then((data) => {
+      if (article_id) {
+        res.status(200).send({ article: data });
+      } else {
+        res.status(200).send({ articles: data });
+      }
     })
     .catch((err) => {
       next(err);
     });
 }
 
-module.exports = { getArticleById };
+module.exports = { getArticles };
