@@ -91,3 +91,30 @@ describe("GET /api/articles/1", () => {
       });
   });
 });
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an object, containing an array of all the articles sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        const article = articles[0];
+
+        expect(articles.length).toBe(13);
+
+        expect(articles).toBeSorted({ descending: true, key: "created_at" });
+
+        expect(typeof article.comment_count).toBe("string");
+        expect(article.body).toBe(undefined);
+      });
+  });
+  test("404: Responds with an error message 'Route not found'", () => {
+    return request(app)
+      .get("/api/articless")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Route not found");
+      });
+  });
+});
