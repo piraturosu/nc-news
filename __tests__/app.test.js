@@ -63,7 +63,7 @@ describe("GET /api/articles/1", () => {
       .then(({ body }) => {
         const article = body.article;
         expect(article).toMatchObject({
-          article_id: expect.any(Number),
+          article_id: 1,
           title: expect.any(String),
           topic: expect.any(String),
           author: expect.any(String),
@@ -212,6 +212,98 @@ describe("POST: /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         expect(body).toEqual({
           message: "Bad request",
+        });
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with an object containing the modified articles with the votes property updated where votes is a positive value", () => {
+    const votes = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votes)
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.article;
+
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 101,
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test("200: Responds with an object containing the modified articles with the votes property updated where votes is a negative value", () => {
+    const votes = { inc_votes: -25 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votes)
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.article;
+
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 75,
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test("404: Responds with an error message 'Article not found' if article doesn't exist", () => {
+    const votes = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/articles/2000")
+      .send(votes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Item not found");
+      });
+  });
+  test("400: Responds with an error message 'Bad request' if article_id is the incorrect data type", () => {
+    const votes = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/articles/numberone")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error message 'Bad request' if vote value is the incorrect data type", () => {
+    const votes = { inc_votes: "one" };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request");
+      });
+  });
+  test("400: responds with error message if body is missing fields", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          message:
+            "Required field not completed. Please provide username and body.",
         });
       });
   });

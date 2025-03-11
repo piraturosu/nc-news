@@ -1,5 +1,6 @@
 const {
-  convertTimestampToDate
+  convertTimestampToDate,
+  checkItemExists,
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
@@ -38,3 +39,19 @@ describe("convertTimestampToDate", () => {
   });
 });
 
+describe("checkItemExists", () => {
+  test("returnes undefined if the item exists in the database", () => {
+    return checkItemExists("articles", "article_id", 1).then((result) => {
+      expect(result).toBe(undefined);
+    });
+  });
+
+  test("retunrs an error if the item does not exist", () => {
+    return checkItemExists("articles", "article_id", 999).catch((err) => {
+      expect(err).toEqual({
+        status: 404,
+        message: "Item not found",
+      });
+    });
+  });
+});
