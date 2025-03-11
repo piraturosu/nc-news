@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkItemExists } = require("../db/seeds/utils");
 
 function fetchArticles(article_id) {
   if (article_id) {
@@ -37,4 +38,27 @@ function fetchCommentsByArticleId(id) {
   })
 }
 
-module.exports = { fetchArticles, fetchCommentsByArticleId };
+function updateArticleVotes(article_id, inc_votes) {
+  if (!inc_votes) {
+    return Promise.reject({
+      status: 400,
+      message:
+        "Required field not completed. Please provide username and body.",
+    });
+  }
+  return checkItemExists("articles", "article_id", article_id).then(() => {
+    return db
+      .query(
+        `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+        [inc_votes, article_id],
+      )
+      .then(({ rows }) => {
+        return rows;
+      });
+  });
+}
+module.exports = {
+  fetchArticles,
+  fetchCommentsByArticleId,
+  updateArticleVotes,
+};
