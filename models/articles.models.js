@@ -26,4 +26,15 @@ function fetchArticles(article_id) {
   }
 }
 
-module.exports = { fetchArticles };
+function fetchCommentsByArticleId(id) {
+  return db.query(
+    "SELECT * FROM comments WHERE article_id = $1 ORDER BY comments.created_at DESC", [id]
+  ).then(({rows}) =>{
+    if(rows.length === 0){
+      return Promise.reject({ status: 404, message: "Article not found" });
+    }
+    return rows
+  })
+}
+
+module.exports = { fetchArticles, fetchCommentsByArticleId };

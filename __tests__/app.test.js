@@ -118,3 +118,43 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        const comment = comments[0];
+
+        expect(comments.length).toBe(11);
+        expect(comments).toBeSorted({ descending: true, key: "created_at" });
+
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          article_id: expect.any(Number),
+        });
+      });
+  });
+  test("404: Responds with an error message 'Article not found' if article doesn't exist", () => {
+    return request(app)
+      .get("/api/articles/2000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
+  });
+  test("400: Responds with an error message 'Bad request' if article_id is the incorrect data type", () => {
+    return request(app)
+      .get("/api/articles/numberone/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request");
+      });
+  });
+});
