@@ -8,7 +8,8 @@ const {
   handleServerErrors,
 } = require("./controllers/errors.controllers");
 const {
-  getArticles,
+  getAllArticles,
+  getArticleById,
   getCommentsByArticleId,
   patchArticleById,
 } = require("./controllers/articles.controller");
@@ -27,9 +28,9 @@ app.get("/api", getApi);
 
 app.get("/api/topics", getAllTopics);
 
-app.get("/api/articles/:article_id", getArticles);
+app.get("/api/articles/:article_id", getArticleById);
 
-app.get("/api/articles", getArticles);
+app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 

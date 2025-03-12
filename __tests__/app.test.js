@@ -109,6 +109,31 @@ describe("GET /api/articles", () => {
         expect(article.body).toBe(undefined);
       });
   });
+  test("200: Responds with articles sorted by title in ascending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeSorted({ ascending: true, key: "title" });
+      });
+  });
+  test("400: Responds with error sort_by column is not a column in the articles table", () => {
+    return request(app)
+      .get("/api/articles?sort_by=fiction")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request: Invalid sort_by query");
+      });
+  });
+  test("400: Responds with error order is not an accepted value", () => {
+    return request(app)
+      .get("/api/articles?order=normal")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request: Invalid order query");
+      });
+  });
   test("404: Responds with an error message 'Route not found'", () => {
     return request(app)
       .get("/api/articless")
@@ -227,7 +252,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(200)
       .then(({ body }) => {
         const article = body.article;
-
         expect(article).toMatchObject({
           article_id: 1,
           title: expect.any(String),
@@ -358,7 +382,7 @@ describe("GET /api/users", () => {
       });
   });
   test("404: Responds with 404 status and an error message 'No users found' if no users exist", () => {
-    db.query("DELETE FROM users").then(() => {
+    return db.query("DELETE FROM users").then(() => {
       return request(app)
         .get("/api/users")
         .expect(404)
