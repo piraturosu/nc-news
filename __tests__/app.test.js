@@ -118,6 +118,16 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ ascending: true, key: "title" });
       });
   });
+  test("200: Responds with articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(1);
+        expect(body.articles[0].topic).toBe("cats");
+      });
+  });
+
   test("400: Responds with error sort_by column is not a column in the articles table", () => {
     return request(app)
       .get("/api/articles?sort_by=fiction")
@@ -132,6 +142,14 @@ describe("GET /api/articles", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Bad request: Invalid order query");
+      });
+  });
+  test("404: Responds with an error message 'No articles found for given topic'", () => {
+    return request(app)
+      .get("/api/articles?topic=dogs")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("No articles found for given topic.");
       });
   });
   test("404: Responds with an error message 'Route not found'", () => {

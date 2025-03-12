@@ -14,7 +14,8 @@
     "queries": ["author", "topic", "sort_by", "order"],
     "queryDescriptions": {
       "sort_by": "Sorts articles by a valid column - defaults to 'created_at'",
-      "order": "Orders results in ascending ('ASC') or descending ('DESC') order - defaults to descending order "
+      "order": "Orders results in ascending ('ASC') or descending ('DESC') order - defaults to descending order ",
+      "topic": "Filters articles by a specific topic."
     },
     "exampleResponse": {
       "articles": [
