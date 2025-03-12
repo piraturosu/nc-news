@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkItemExists } = require("../db/seeds/utils");
 
 function insertComment(article_id, username, body) {
   if (!username || !body) {
@@ -18,4 +19,10 @@ function insertComment(article_id, username, body) {
     });
 }
 
-module.exports = { insertComment };
+function deleteComment(id) {
+  return checkItemExists("comments", "comment_id", id).then(() => {
+    return db.query("DELETE FROM comments WHERE comment_id = $1", [id]);
+  });
+}
+
+module.exports = { insertComment, deleteComment };
