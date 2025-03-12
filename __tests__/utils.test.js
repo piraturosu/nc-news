@@ -3,6 +3,19 @@ const {
   checkItemExists,
 } = require("../db/seeds/utils");
 
+const db = require("../db/connection");
+const data = require("../db/data/test-data");
+const seed = require("../db/seeds/seed");
+/* Set up your beforeEach & afterAll functions here */
+
+beforeEach(() => {
+  return seed(data);
+});
+
+afterAll(() => {
+  db.end();
+});
+
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
     const timestamp = 1557572706232;

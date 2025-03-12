@@ -20,7 +20,7 @@ function fetchArticleById(article_id) {
   }
 }
 
-function fetchAllArticles(sort_by, order) {
+function fetchAllArticles(sort_by, order, topic) {
   const query = [];
 
   let queryString = `SELECT
@@ -32,7 +32,14 @@ function fetchAllArticles(sort_by, order) {
   articles.votes,
   articles.article_img_url,
   COUNT(comments.comment_id) AS comment_count FROM articles
-  LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id`;
+  LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+  if (topic) {
+    query.push(topic);
+    queryString += ` WHERE articles.topic = %L`;
+  }
+
+  queryString += ` GROUP by articles.article_id`;
 
   if (!sort_by && !order) {
     queryString += ` ORDER BY articles.created_at DESC`;
@@ -48,7 +55,7 @@ function fetchAllArticles(sort_by, order) {
     }
 
     query.push(sort_by);
-    queryString += format(` ORDER BY articles.%I`, query[0]);
+    queryString += ` ORDER BY articles.%I`;
   }
 
   if (order) {
@@ -59,11 +66,19 @@ function fetchAllArticles(sort_by, order) {
         message: "Bad request: Invalid order query",
       });
     }
-    query.push(order);
-    queryString += format(` %s;`, query[1].toUpperCase());
+    query.push(order.toUpperCase());
+    queryString += ` %s;`;
   }
 
+  queryString = format(queryString, ...query);
+
   return db.query(queryString).then(({ rows }) => {
+    if (topic && rows.length === 0) {
+      return Promise.reject({
+        status: 404,
+        message: "No articles found for given topic.",
+      });
+    }
     return rows;
   });
 }
