@@ -17,6 +17,8 @@ const {
   deleteCommentById,
 } = require("./controllers/comments.controllers");
 
+const { getAllUsers } = require("./controllers/users.controller");
+
 const app = express();
 
 app.use(express.json());
@@ -36,6 +38,8 @@ app.post("/api/articles/:article_id/comments", postComment);
 app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api/users", getAllUsers);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ message: "Route not found" });

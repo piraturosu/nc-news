@@ -338,3 +338,33 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+describe("GET /api/users", () => {
+  test("200: Responds with an object that contains an array of all the users in the database", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const users = body.users;
+        const user = users[0];
+
+        expect(Array.isArray(users)).toBe(true);
+        expect(users.length).toBe(4);
+
+        expect(user).toMatchObject({
+          username: expect.any(String),
+          name: expect.any(String),
+          avatar_url: expect.any(String),
+        });
+      });
+  });
+  test("404: Responds with 404 status and an error message 'No users found' if no users exist", () => {
+    db.query("DELETE FROM users").then(() => {
+      return request(app)
+        .get("/api/users")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).toBe("No users found");
+        });
+    });
+  });
+});
