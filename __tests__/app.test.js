@@ -262,7 +262,7 @@ describe("PATCH /api/articles/:article_id", () => {
         });
       });
   });
-  test("404: Responds with an error message 'Article not found' if article doesn't exist", () => {
+  test("404: Responds with an error message 'Item not found' if article doesn't exist", () => {
     const votes = { inc_votes: 1 };
 
     return request(app)
@@ -305,6 +305,36 @@ describe("PATCH /api/articles/:article_id", () => {
           message:
             "Required field not completed. Please provide username and body.",
         });
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Responds with an empty content and deletes the comment provided from db", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(() => {
+        return db.query("SELECT * FROM comments WHERE comment_id = 1");
+      })
+      .then(({ rows }) => {
+        expect(rows.length).toBe(0);
+      });
+  });
+  test("404: Responds with an error message 'Item not found'", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Item not found");
+      });
+  });
+  test("400: Responds with an error message 'Bad request' if comment id is not the correct data type", () => {
+    return request(app)
+      .delete("/api/comments/nine")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request");
       });
   });
 });
