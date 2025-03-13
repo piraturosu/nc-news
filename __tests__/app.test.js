@@ -64,13 +64,15 @@ describe("GET /api/articles/1", () => {
         const article = body.article;
         expect(article).toMatchObject({
           article_id: 1,
-          title: expect.any(String),
-          topic: expect.any(String),
-          author: expect.any(String),
-          body: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-          article_img_url: expect.any(String),
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: "11",
         });
       });
   });
@@ -121,6 +123,15 @@ describe("GET /api/articles", () => {
   test("200: Responds with articles filtered by topic", () => {
     return request(app)
       .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toHaveLength(1);
+        expect(body.articles[0].topic).toBe("cats");
+      });
+  });
+  test("200: Responds with articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats&sort_by=")
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toHaveLength(1);
