@@ -391,6 +391,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
 describe("GET /api/users", () => {
   test("200: Responds with an object that contains an array of all the users in the database", () => {
     return request(app)
@@ -419,5 +420,30 @@ describe("GET /api/users", () => {
           expect(body.message).toBe("No users found");
         });
     });
+  });
+});
+
+describe("GET /api/users/:user_id", () => {
+  test("200: Responds with an object containing the requested user by id", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then(({ body }) => {
+        const user = body.user;
+        expect(user).toEqual({
+          username: "butter_bridge",
+          name: "jonny",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+        });
+      });
+  });
+  test("404: Responds with an error message 'Item not found'", () => {
+    return request(app)
+      .get("/api/users/1")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Item not found");
+      });
   });
 });
