@@ -424,7 +424,7 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/users/:user_id", () => {
-  test.only("200: Responds with an object containing the requested user by id", () => {
+  test("200: Responds with an object containing the requested user by id", () => {
     return request(app)
       .get("/api/users/butter_bridge")
       .expect(200)
@@ -438,7 +438,7 @@ describe("GET /api/users/:user_id", () => {
         });
       });
   });
-  test.only("404: Responds with an error message 'Item not found'", () => {
+  test("404: Responds with an error message 'Item not found'", () => {
     return request(app)
       .get("/api/users/1")
       .expect(404)
