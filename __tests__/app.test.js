@@ -447,3 +447,75 @@ describe("GET /api/users/:user_id", () => {
       });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: Responds with an object containing the modified comment", () => {
+    const votes = { inc_votes: 20 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votes)
+      .expect(200)
+      .then(({ body }) => {
+        const comment = body.comment;
+
+        expect(comment).toEqual({
+          comment_id: 1,
+          article_id: 9,
+          author: "butter_bridge",
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          created_at: "2020-04-06T12:17:00.000Z",
+          votes: 36,
+        });
+      });
+  });
+  test("200: Responds with an object containing the modified comment if value being passed is negative", () => {
+    const votes = { inc_votes: -20 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votes)
+      .expect(200)
+      .then(({ body }) => {
+        const comment = body.comment;
+        expect(comment).toEqual({
+          comment_id: 1,
+          article_id: 9,
+          author: "butter_bridge",
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          created_at: "2020-04-06T12:17:00.000Z",
+          votes: -4,
+        });
+      });
+  });
+  test("404: Item not found if the comment doesn't exist", () => {
+    const votes = { inc_votes: 20 };
+    return request(app)
+      .patch("/api/comments/999")
+      .send(votes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Item not found");
+      });
+  });
+  test("400: Bad request if the comment_id is not the correct data type", () => {
+    const votes = { inc_votes: 20 };
+    return request(app)
+      .patch("/api/comments/nine")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad request");
+      });
+  });
+  test("400: Required field not completed. Please provide inc_votes if the body is not passed a value", () => {
+    const votes = {};
+    return request(app)
+      .patch("/api/comments/1")
+      .send(votes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Required field not completed. Please provide inc_votes",
+        );
+      });
+  });
+});

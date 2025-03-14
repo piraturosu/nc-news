@@ -1,4 +1,8 @@
-const { insertComment, deleteComment } = require("../models/comments.models");
+const {
+  insertComment,
+  deleteComment,
+  updateCommentVotesById,
+} = require("../models/comments.models");
 
 function postComment(req, res, next) {
   const { article_id } = req.params;
@@ -20,4 +24,14 @@ function deleteCommentById(req, res, next) {
     .catch(next);
 }
 
-module.exports = { postComment, deleteCommentById };
+function patchCommentById(req, res, next) {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+  updateCommentVotesById(comment_id, inc_votes)
+    .then((comment) => {
+      res.status(200).send({ comment });
+    })
+    .catch(next);
+}
+
+module.exports = { postComment, deleteCommentById, patchCommentById };
