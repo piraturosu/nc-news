@@ -119,9 +119,28 @@ function updateArticleVotes(article_id, inc_votes) {
       });
   });
 }
+
+function createArticle(author, title, body, topic, article_img_url) {
+  if (!author || !title || !body || !topic) {
+    return Promise.reject({
+      status: 400,
+      message: "All fields must be filled.",
+    });
+  }
+  const articleArr = [title, topic, author, body, article_img_url];
+  return db
+    .query(
+      `INSERT INTO articles (title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      articleArr,
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+}
 module.exports = {
   fetchAllArticles,
   fetchArticleById,
   fetchCommentsByArticleId,
   updateArticleVotes,
+  createArticle,
 };
