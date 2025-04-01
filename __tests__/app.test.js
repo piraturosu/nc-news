@@ -583,7 +583,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test.only("400: Responds with an error 'Bad request' if author doesn't exist", () => {
+  test("400: Responds with an error 'Bad request' if author doesn't exist", () => {
     const article = {
       author: "butter",
       title: "Posting an article",

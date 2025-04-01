@@ -31,6 +31,7 @@ function fetchAllArticles(sort_by, order, topic) {
   articles.title,
   articles.article_id,
   articles.topic,
+  articles.body,
   articles.created_at,
   articles.votes,
   articles.article_img_url,
