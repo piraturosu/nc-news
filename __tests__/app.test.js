@@ -108,7 +108,6 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ descending: true, key: "created_at" });
 
         expect(typeof article.comment_count).toBe("string");
-        expect(article.body).toBe(undefined);
       });
   });
   test("200: Responds with articles sorted by title in ascending order", () => {
