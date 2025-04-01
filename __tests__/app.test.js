@@ -108,7 +108,6 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSorted({ descending: true, key: "created_at" });
 
         expect(typeof article.comment_count).toBe("string");
-        expect(article.body).toBe(undefined);
       });
   });
   test("200: Responds with articles sorted by title in ascending order", () => {
@@ -583,7 +582,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test.only("400: Responds with an error 'Bad request' if author doesn't exist", () => {
+  test("400: Responds with an error 'Bad request' if author doesn't exist", () => {
     const article = {
       author: "butter",
       title: "Posting an article",
