@@ -78,6 +78,7 @@
   },
   "POST /api/articles/:article_id/comments": {
     "description": "Adds a comment to the provided article",
+    "requestBody": { "username": "butter_bridge", "body": "Hello NC News!" },
     "exampleResponse": {
       "comment": {
         "comment_id": 19,
