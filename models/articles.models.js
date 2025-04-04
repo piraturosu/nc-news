@@ -50,7 +50,15 @@ function fetchAllArticles(sort_by, order, topic) {
   }
 
   if (sort_by) {
-    const allowedSortBy = ["author", "title", "article_id", "topic", "votes", "created_at", "comment_count"];
+    const allowedSortBy = [
+      "author",
+      "title",
+      "article_id",
+      "topic",
+      "votes",
+      "created_at",
+      "comment_count",
+    ];
     if (!allowedSortBy.includes(sort_by)) {
       return Promise.reject({
         status: 400,
@@ -59,7 +67,8 @@ function fetchAllArticles(sort_by, order, topic) {
     }
 
     query.push(sort_by);
-    queryString += ` ORDER BY articles.%I`;
+    queryString +=
+      sort_by === "comment_count" ? ` ORDER BY %I` : ` ORDER BY articles.%I`;
   }
 
   if (order) {
