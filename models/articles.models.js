@@ -50,7 +50,7 @@ function fetchAllArticles(sort_by, order, topic) {
   }
 
   if (sort_by) {
-    const allowedSortBy = ["author", "title", "article_id", "topic", "votes"];
+    const allowedSortBy = ["author", "title", "article_id", "topic", "votes", "created_at", "comment_count"];
     if (!allowedSortBy.includes(sort_by)) {
       return Promise.reject({
         status: 400,
