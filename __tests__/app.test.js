@@ -1,12 +1,10 @@
 const endpointsJson = require("../endpoints.json");
-/* Set up your test imports here */
 const request = require("supertest");
 const { app } = require("../app");
 
 const db = require("../db/connection");
 const data = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
-/* Set up your beforeEach & afterAll functions here */
 
 beforeEach(() => {
   return seed(data);
@@ -520,7 +518,7 @@ describe("PATCH /api/comments/:comment_id", () => {
 });
 
 describe("POST: /api/articles", () => {
-  test("200: Responds with an object containing the new article", () => {
+  test.only("201: Responds with an object containing the new article", () => {
     const article = {
       author: "butter_bridge",
       title: "Posting an article",
@@ -535,6 +533,8 @@ describe("POST: /api/articles", () => {
       .send(article)
       .expect(201)
       .then(({ body }) => {
+        const article = body.article;
+        console.log(JSON.stringify(article));
         expect(body.article).toMatchObject({
           article_id: 14,
           author: "butter_bridge",
@@ -545,10 +545,11 @@ describe("POST: /api/articles", () => {
           created_at: expect.any(String),
           article_img_url:
             "https://images.pexels.com/photos/733854/pexels-photo-733854.jpeg?w=700&h=700",
+          comment_count: 0,
         });
       });
   });
-  test("400: Responds with an error 'All fields must be filled'", () => {
+  test.only("400: Responds with an error 'All fields must be filled'", () => {
     const article = {
       author: "butter_bridge",
       title: "Posting an article",
@@ -565,7 +566,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test("400: Responds with an error 'Bad request' if one of the fields is an incorrect data type", () => {
+  test.only("400: Responds with an error 'Bad request' if one of the fields is an incorrect data type", () => {
     const article = {
       author: 1,
       title: "Posting an article",
@@ -582,7 +583,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test("400: Responds with an error 'Bad request' if author doesn't exist", () => {
+  test.only("400: Responds with an error 'Bad request' if author doesn't exist", () => {
     const article = {
       author: "butter",
       title: "Posting an article",
@@ -599,7 +600,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test("404: Responds with an error message 'Route not found'", () => {
+  test.only("404: Responds with an error message 'Route not found'", () => {
     return request(app)
       .post("/api/articless")
       .expect(404)

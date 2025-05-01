@@ -34,18 +34,23 @@
   "POST /api/articles": {
     "description": "inserts a new article in the articles table",
     "input fields": ["author", "title", "body", "topic"],
+    "example request": {
+      "author": "butter_bridge",
+      "title": "A new article",
+      "body": "This is the body of the new article.",
+      "topic": "cooking"
+    },
     "exampleResponse": {
-      "article": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "comment_count": 6
-        }
-      ]
+      "article": {
+        "article_id": 1,
+        "title": "A new article",
+        "topic": "cooking",
+        "author": "butter_bridge",
+        "body": "This is the body of the new article.",
+        "created_at": "2025-03-11T12:16:57.436Z",
+        "votes": 0,
+        "comment_count": 0
+      }
     }
   },
   "GET /api/articles/:article_id": {
@@ -124,7 +129,6 @@
       }
     }
   },
-
   "DELETE /api/comments/:comment_id": {
     "description": "Deletes the specified comment by comment_id. No response body is returned upon success."
   },
