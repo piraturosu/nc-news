@@ -1,12 +1,31 @@
 name: CI/CD Pipeline
+
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: nc_news_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health retries 5
+          -e POSTGRES_HOST_AUTH_METHOD=trust
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -14,15 +33,48 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '23'
+          node-version: "20"
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: npm install
 
+      - name: Set up PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create test database
+        env:
+          PGDATABASE: nc_news_test
+          PGHOST: localhost
+          PGPORT: 5432
+        run: npm run setup-dbs
+
+      - name: Seed test database
+        env:
+          NODE_ENV: test
+          PGDATABASE: nc_news_test
+          PGHOST: localhost
+          PGPORT: 5432
+        run: npm run seed-dev
+
       - name: Run tests
+        env:
+          NODE_ENV: test
+          PGDATABASE: nc_news_test
+          PGHOST: localhost
+          PGPORT: 5432
         run: npm test
 
       - name: Deploy to Render
+        if: github.event_name == 'push'
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
