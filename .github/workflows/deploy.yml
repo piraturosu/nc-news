@@ -14,17 +14,14 @@ jobs:
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:16
         env:
           POSTGRES_DB: nc_news_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health retries=5
-          -e POSTGRES_HOST_AUTH_METHOD=trust
+        options: --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
       - name: Checkout code
@@ -33,7 +30,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Cache node modules
         uses: actions/cache@v4
@@ -50,12 +47,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
+      - name: Debug PostgreSQL service
+        run: docker ps
+
       - name: Create test database
         env:
-          PGDATABASE: nc_news_test
           PGHOST: localhost
           PGPORT: 5432
+          PGUSER: postgres
         run: npm run setup-dbs
+
+      - name: Debug database creation
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+        run: psql -c "\l"
 
       - name: Seed test database
         env:
@@ -63,7 +70,25 @@ jobs:
           PGDATABASE: nc_news_test
           PGHOST: localhost
           PGPORT: 5432
+          PGUSER: postgres
         run: npm run seed-dev
+
+      - name: Debug tables
+        env:
+          PGDATABASE: nc_news_test
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+        run: psql -c "\dt"
+
+      - name: Debug environment
+        env:
+          NODE_ENV: test
+          PGDATABASE: nc_news_test
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+        run: env | grep -E 'NODE_ENV|PG'
 
       - name: Run tests
         env:
@@ -71,6 +96,7 @@ jobs:
           PGDATABASE: nc_news_test
           PGHOST: localhost
           PGPORT: 5432
+          PGUSER: postgres
         run: npm test
 
       - name: Deploy to Render
