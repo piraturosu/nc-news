@@ -534,7 +534,6 @@ describe("POST: /api/articles", () => {
       .expect(201)
       .then(({ body }) => {
         const article = body.article;
-        console.log(JSON.stringify(article));
         expect(body.article).toMatchObject({
           article_id: 14,
           author: "butter_bridge",
