@@ -518,7 +518,7 @@ describe("PATCH /api/comments/:comment_id", () => {
 });
 
 describe("POST: /api/articles", () => {
-  test.only("201: Responds with an object containing the new article", () => {
+  test("201: Responds with an object containing the new article", () => {
     const article = {
       author: "butter_bridge",
       title: "Posting an article",
@@ -549,7 +549,7 @@ describe("POST: /api/articles", () => {
         });
       });
   });
-  test.only("400: Responds with an error 'All fields must be filled'", () => {
+  test("400: Responds with an error 'All fields must be filled'", () => {
     const article = {
       author: "butter_bridge",
       title: "Posting an article",
@@ -566,7 +566,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test.only("400: Responds with an error 'Bad request' if one of the fields is an incorrect data type", () => {
+  test("400: Responds with an error 'Bad request' if one of the fields is an incorrect data type", () => {
     const article = {
       author: 1,
       title: "Posting an article",
@@ -583,7 +583,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test.only("400: Responds with an error 'Bad request' if author doesn't exist", () => {
+  test("400: Responds with an error 'Bad request' if author doesn't exist", () => {
     const article = {
       author: "butter",
       title: "Posting an article",
@@ -600,7 +600,7 @@ describe("POST: /api/articles", () => {
         expect(body.message).toBe("All fields must be filled.");
       });
   });
-  test.only("404: Responds with an error message 'Route not found'", () => {
+  test("404: Responds with an error message 'Route not found'", () => {
     return request(app)
       .post("/api/articless")
       .expect(404)
@@ -610,4 +610,3 @@ describe("POST: /api/articles", () => {
   });
 });
 //TODO fix error handling when item not found - psql error and all the tests where this is used
-//TODO how to return the created article plus the comment_count
