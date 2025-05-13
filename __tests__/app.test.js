@@ -609,7 +609,7 @@ describe("POST: /api/articles", () => {
 });
 
 describe("POST /api/topics", () => {
-  test.only("201: Responds with an object containing the newly added topic", () => {
+  test("201: Responds with an object containing the newly added topic", () => {
     const body = { slug: "newTopic", description: "newDescription" };
     return request(app)
       .post("/api/topics")
@@ -622,7 +622,7 @@ describe("POST /api/topics", () => {
         });
       });
   });
-  test.only("400: Responds with an error message 'Required fields not completed. Please add fields slug and description.' if request body is missing one of the fields", () => {
+  test("400: Responds with an error message 'Required fields not completed. Please add fields slug and description.' if request body is missing one of the fields", () => {
     const body = { slug: "newTopic" };
     return request(app)
       .post("/api/topics")
