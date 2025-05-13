@@ -353,7 +353,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body).toEqual({
           message:
-            "Required field not completed. Please provide username and body.",
+            "Required field not completed. Please provide inc_votes body.",
         });
       });
   });
@@ -533,7 +533,6 @@ describe("POST: /api/articles", () => {
       .send(article)
       .expect(201)
       .then(({ body }) => {
-        const article = body.article;
         expect(body.article).toMatchObject({
           article_id: 14,
           author: "butter_bridge",
@@ -605,6 +604,34 @@ describe("POST: /api/articles", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Route not found");
+      });
+  });
+});
+
+describe("POST /api/topics", () => {
+  test.only("201: Responds with an object containing the newly added topic", () => {
+    const body = { slug: "newTopic", description: "newDescription" };
+    return request(app)
+      .post("/api/topics")
+      .send(body)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.topic).toMatchObject({
+          slug: "newTopic",
+          description: "newDescription",
+        });
+      });
+  });
+  test.only("400: Responds with an error message 'Required fields not completed. Please add fields slug and description.' if request body is missing one of the fields", () => {
+    const body = { slug: "newTopic" };
+    return request(app)
+      .post("/api/topics")
+      .send(body)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Required fields not completed. Please add fields slug and description.",
+        );
       });
   });
 });

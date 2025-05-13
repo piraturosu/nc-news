@@ -85,6 +85,8 @@ function fetchAllArticles(sort_by, order, topic) {
 
   queryString = format(queryString, ...query);
 
+  
+
   return db.query(queryString).then(({ rows }) => {
     if (topic && rows.length === 0) {
       return Promise.reject({
@@ -114,8 +116,7 @@ function updateArticleVotes(article_id, inc_votes) {
   if (!inc_votes) {
     return Promise.reject({
       status: 400,
-      message:
-        "Required field not completed. Please provide username and body.",
+      message: "Required field not completed. Please provide inc_votes body.",
     });
   }
   return checkItemExists("articles", "article_id", article_id).then(() => {

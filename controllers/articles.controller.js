@@ -51,11 +51,13 @@ function patchArticleById(req, res, next) {
 
 function postArticle(req, res, next) {
   const { author, title, body, topic, article_img_url } = req.body;
+  
   createArticle(author, title, body, topic, article_img_url)
     .then((article) => {
       res.status(201).send({ article });
     })
     .catch((err) => {
+      console.log(err)
       next(err);
     });
 }

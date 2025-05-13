@@ -153,5 +153,20 @@
         "avatar_url": "https://www.example.com/avatar.jpg"
       }
     }
+  },
+  "POST /api/topics": {
+    "description": "inserts a new topic in the topics table",
+    "input fields": ["slug", "description", "img_url"],
+    "example request": {
+      "slug": "newTopic",
+      "description": "newDescription"
+    },
+    "exampleResponse": {
+      "topic": {
+        "slug": "newTopic",
+        "description": "newDescription",
+        "img_url": null
+      }
+    }
   }
 }
