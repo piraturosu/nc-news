@@ -168,5 +168,8 @@
         "img_url": null
       }
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "Deletes the specified article by article_id. No response body is returned upon success."
   }
 }

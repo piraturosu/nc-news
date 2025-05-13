@@ -85,8 +85,6 @@ function fetchAllArticles(sort_by, order, topic) {
 
   queryString = format(queryString, ...query);
 
-  
-
   return db.query(queryString).then(({ rows }) => {
     if (topic && rows.length === 0) {
       return Promise.reject({
@@ -158,10 +156,17 @@ function createArticle(author, title, body, topic, article_img_url) {
     .then(({ rows }) => rows[0]);
 }
 
+function deleteArticle(article_id) {
+  return checkItemExists("articles", "article_id", article_id).then(() => {
+    return db.query("DELETE FROM articles WHERE article_id = $1", [article_id]);
+  });
+}
+
 module.exports = {
   fetchAllArticles,
   fetchArticleById,
   fetchCommentsByArticleId,
   updateArticleVotes,
   createArticle,
+  deleteArticle
 };
