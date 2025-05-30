@@ -23,7 +23,7 @@ function fetchArticleById(article_id) {
   }
 }
 
-function fetchAllArticles(sort_by, order, topic) {
+function fetchAllArticles(sort_by, order, topic, limit = 10) {
   const query = [];
 
   let queryString = `SELECT
@@ -103,9 +103,6 @@ function fetchCommentsByArticleId(id) {
       [id],
     )
     .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ status: 404, message: "Article not found" });
-      }
       return rows;
     });
 }
@@ -168,5 +165,5 @@ module.exports = {
   fetchCommentsByArticleId,
   updateArticleVotes,
   createArticle,
-  deleteArticle
+  deleteArticle,
 };
