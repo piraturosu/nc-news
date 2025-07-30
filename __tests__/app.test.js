@@ -242,7 +242,7 @@ describe("POST: /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test("404: responds with error message if article doesn't exist", () => {
+  test("404: responds with error message 'Item not found' if article doesn't exist", () => {
     const newComment = { username: "butter_bridge", body: "Hello NC News!" };
     return request(app)
       .post("/api/articles/999/comments")
@@ -250,7 +250,7 @@ describe("POST: /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body).toEqual({
-          message: "Article doesn't exist.",
+          message: "Item not found",
         });
       });
   });
@@ -637,7 +637,7 @@ describe("POST /api/topics", () => {
 });
 
 describe("DELETE /api/articles/:article_id deletes an article ", () => {
-  test.only("204: Responds with an empty content and deletes the comment provided from db", () => {
+  test("204: Responds with an empty content and deletes the comment provided from db", () => {
     return request(app)
       .delete("/api/articles/1")
       .expect(204)
@@ -648,7 +648,7 @@ describe("DELETE /api/articles/:article_id deletes an article ", () => {
         expect(rows.length).toBe(0);
       });
   });
-  test.only("404: Responds with an error message 'Item not found' if the article id doesn't exist", () => {
+  test("404: Responds with an error message 'Item not found' if the article id doesn't exist", () => {
     return request(app)
       .delete("/api/articles/999")
       .expect(404)
@@ -656,7 +656,7 @@ describe("DELETE /api/articles/:article_id deletes an article ", () => {
         expect(body.message).toBe("Item not found");
       });
   });
-  test.only("400: Responds with an error message 'Bad request' if the article id is not the correct data type", () => {
+  test("400: Responds with an error message 'Bad request' if the article id is not the correct data type", () => {
     return request(app)
       .delete("/api/articles/one")
       .expect(400)
@@ -664,7 +664,7 @@ describe("DELETE /api/articles/:article_id deletes an article ", () => {
         expect(body.message).toBe("Bad request");
       });
   });
-  test.only("404: Responds with an error message 'Route not found' if the route was misspelled", () => {
+  test("404: Responds with an error message 'Route not found' if the route was misspelled", () => {
     return request(app)
       .delete("/api/artcles/1")
       .expect(404)
@@ -673,4 +673,3 @@ describe("DELETE /api/articles/:article_id deletes an article ", () => {
       });
   });
 });
-//TODO fix error handling when item not found - psql error and all the tests where this is used

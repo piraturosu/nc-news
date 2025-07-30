@@ -103,6 +103,13 @@ function fetchCommentsByArticleId(id) {
       [id],
     )
     .then(({ rows }) => {
+      const comment = rows[0];
+      if(!comment) {
+        return Promise.reject({
+          status: 404,
+          message: "Article not found"
+        })
+      }
       return rows;
     });
 }
