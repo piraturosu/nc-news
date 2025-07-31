@@ -23,20 +23,42 @@ function fetchArticleById(article_id) {
   }
 }
 
-function fetchAllArticles(sort_by, order, topic, limit = 10) {
+async function fetchAllArticles(sort_by, order, topic, limit = 10, page = 1) {
   const query = [];
 
+  let countQuery = `SELECT COUNT(*) AS total FROM articles`;
+  if (topic) {
+    countQuery += ` WHERE topic = %L`;
+    query.push(topic);
+  }
+  const formattedCountQuery = format(countQuery, ...query);
+
+  const {
+    rows: [{ total }],
+  } = await db.query(formattedCountQuery);
+  const totalArticles = parseInt(total);
+  const maxPages = Math.ceil(totalArticles / limit);
+
+  if (page > maxPages && totalArticles > 0) {
+    return Promise.reject({
+      status: 404,
+      message: "No articles found for this page",
+    });
+  }
+
+  query.length = 0;
+
   let queryString = `SELECT
-  articles.author,
-  articles.title,
-  articles.article_id,
-  articles.topic,
-  articles.body,
-  articles.created_at,
-  articles.votes,
-  articles.article_img_url,
-  COUNT(comments.comment_id) AS comment_count FROM articles
-  LEFT JOIN comments ON articles.article_id = comments.article_id`;
+    articles.author,
+    articles.title,
+    articles.article_id,
+    articles.topic,
+    articles.body,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url,
+    COUNT(comments.comment_id) AS comment_count FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
   if (topic) {
     query.push(topic);
@@ -80,20 +102,44 @@ function fetchAllArticles(sort_by, order, topic, limit = 10) {
       });
     }
     query.push(order.toUpperCase());
-    queryString += ` %s;`;
+    queryString += ` %s`;
   }
 
-  queryString = format(queryString, ...query);
+  const offset = (page - 1) * limit;
+  query.push(limit, offset);
+  queryString += ` LIMIT %L OFFSET %L`;
 
-  return db.query(queryString).then(({ rows }) => {
-    if (topic && rows.length === 0) {
-      return Promise.reject({
-        status: 404,
-        message: "No articles found for given topic.",
-      });
-    }
-    return rows;
-  });
+  const formattedQuery = format(queryString, ...query);
+
+  return Promise.all([
+    db.query(formattedCountQuery),
+    db.query(formattedQuery),
+  ]).then(
+    ([
+      {
+        rows: [{ total }],
+      },
+      { rows: articles },
+    ]) => {
+      const totalArticles = parseInt(total);
+      const maxPages = Math.ceil(totalArticles / limit);
+
+      if (page > maxPages && totalArticles > 0) {
+        return Promise.reject({
+          status: 404,
+          message: "No articles found for this page",
+        });
+      }
+      if (topic && articles.length === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "No articles found for this topic.",
+        });
+      }
+
+      return { articles, totalArticles };
+    },
+  );
 }
 
 function fetchCommentsByArticleId(id) {
@@ -104,11 +150,11 @@ function fetchCommentsByArticleId(id) {
     )
     .then(({ rows }) => {
       const comment = rows[0];
-      if(!comment) {
+      if (!comment) {
         return Promise.reject({
           status: 404,
-          message: "Article not found"
-        })
+          message: "Article not found",
+        });
       }
       return rows;
     });

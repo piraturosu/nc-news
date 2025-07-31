@@ -18,10 +18,18 @@ function getArticleById(req, res, next) {
 }
 
 function getAllArticles(req, res, next) {
-  const { sort_by, order, topic } = req.query;
-  fetchAllArticles(sort_by, order, topic)
-    .then((articles) => {
-      res.status(200).send({ articles });
+  const { sort_by, order, topic, page } = req.query;
+
+  if (isNaN(page) || page < 1) {
+    return next({
+      status: 400,
+      message: "Bad request. Page must be a positive number",
+    });
+  }
+
+  fetchAllArticles(sort_by, order, topic, 10, page)
+    .then(({articles, totalArticles}) => {
+      res.status(200).send({ articles, totalArticles });
     })
     .catch(next);
 }

@@ -93,24 +93,26 @@ describe("GET /api/articles/1", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200: Responds with an object, containing an array of all the articles sorted by date in descending order", () => {
+  test("200: Responds with an object, containing an array of 10 articles sorted by date in descending order", () => {
     return request(app)
-      .get("/api/articles")
+      .get("/api/articles?page=1")
       .expect(200)
       .then(({ body }) => {
-        const articles = body.articles;
-        const article = articles[0];
-
-        expect(articles.length).toBe(13);
-
-        expect(articles).toBeSorted({ descending: true, key: "created_at" });
-
-        expect(typeof article.comment_count).toBe("string");
+        const { articles, totalArticles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBeLessThanOrEqual(10);
+        expect(typeof totalArticles).toBe("number");
+        expect(totalArticles).toBeGreaterThanOrEqual(articles.length);
+        expect(articles).toBeSorted({
+          descending: true,
+          key: "created_at",
+        });
+        expect(typeof articles[0].comment_count).toBe("string");
       });
   });
   test("200: Responds with articles sorted by title in ascending order", () => {
     return request(app)
-      .get("/api/articles?sort_by=title&order=asc")
+      .get("/api/articles?page=1&sort_by=title&order=asc")
       .expect(200)
       .then(({ body }) => {
         const articles = body.articles;
@@ -119,16 +121,24 @@ describe("GET /api/articles", () => {
   });
   test("200: Responds with articles filtered by topic", () => {
     return request(app)
-      .get("/api/articles?topic=cats")
+      .get("/api/articles?page=1&topic=mitch")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toHaveLength(1);
-        expect(body.articles[0].topic).toBe("cats");
+        expect(body.articles).toHaveLength(10);
+        expect(body.articles[0].topic).toBe("mitch");
+      });
+  });
+  test("404: Responds with error message 'No articles found for this page' if the topic doesn't have page 2 articles", () => {
+    return request(app)
+      .get("/api/articles?page=2&topic=cats")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("No articles found for this page");
       });
   });
   test("200: Responds with articles filtered by topic", () => {
     return request(app)
-      .get("/api/articles?topic=cats&sort_by=")
+      .get("/api/articles?page=1&topic=cats&sort_by=")
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toHaveLength(1);
@@ -138,7 +148,7 @@ describe("GET /api/articles", () => {
 
   test("400: Responds with error sort_by column is not a column in the articles table", () => {
     return request(app)
-      .get("/api/articles?sort_by=fiction")
+      .get("/api/articles?page=1&sort_by=fiction")
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Bad request: Invalid sort_by query");
@@ -146,18 +156,18 @@ describe("GET /api/articles", () => {
   });
   test("400: Responds with error order is not an accepted value", () => {
     return request(app)
-      .get("/api/articles?order=normal")
+      .get("/api/articles?page=1&order=normal")
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Bad request: Invalid order query");
       });
   });
-  test("404: Responds with an error message 'No articles found for given topic'", () => {
+  test("404: Responds with an error message 'No articles found for this topic.'", () => {
     return request(app)
-      .get("/api/articles?topic=dogs")
+      .get("/api/articles?page=1&topic=dogs")
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe("No articles found for given topic.");
+        expect(body.message).toBe("No articles found for this topic.");
       });
   });
   test("404: Responds with an error message 'Route not found'", () => {
@@ -166,6 +176,46 @@ describe("GET /api/articles", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Route not found");
+      });
+  });
+  test("400: Responds with error when page is not a number", () => {
+    return request(app)
+      .get("/api/articles?page=abc")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Bad request. Page must be a positive number",
+        );
+      });
+  });
+
+  test("400: Responds with error when page is negative", () => {
+    return request(app)
+      .get("/api/articles?page=-1")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Bad request. Page must be a positive number",
+        );
+      });
+  });
+
+  test("400: Responds with error when page is zero", () => {
+    return request(app)
+      .get("/api/articles?page=0")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Bad request. Page must be a positive number",
+        );
+      });
+  });
+  test("404: Responds with error for page number exceeding available articles", () => {
+    return request(app)
+      .get("/api/articles?page=100")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("No articles found for this page");
       });
   });
 });
