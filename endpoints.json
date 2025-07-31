@@ -10,12 +10,13 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles with pagination, and optional filter and sorting",
+    "queries": ["topic", "sort_by", "order", "page"],
     "queryDescriptions": {
       "sort_by": "Sorts articles by a valid column - defaults to 'created_at'",
       "order": "Orders results in ascending ('ASC') or descending ('DESC') order - defaults to descending order ",
-      "topic": "Filters articles by a specific topic."
+      "topic": "Filters articles by a specific topic.",
+      "page": "Returns a paginated list of articles, 10 per page. Includes the total number of pages available."
     },
     "exampleResponse": {
       "articles": [
